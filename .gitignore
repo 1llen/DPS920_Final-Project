@@ -1,0 +1,19 @@
+# Data 
+data/
+IMG/
+driving_log.csv
+
+# Trained models
+*.h5
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Env
+venv_CV-Project/
+.vscode/
+
+# Recording
+*.mp4
