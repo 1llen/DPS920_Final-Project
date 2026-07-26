@@ -5,42 +5,44 @@ from imgaug import augmenters as iaa
 
 from preprocessing import load_image, preProcessing
 
-
 def zoom(img):
-    aug = iaa.Affine(scale=(1.0, 1.3))
-    return aug.augment_image(img)
+    h, w = img.shape[:2]
+    scale = np.random.uniform(1.0, 1.3)
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), 0, scale)
+    return cv2.warpAffine(img, M, (w, h))
 
 
 def pan(img):
-    aug = iaa.Affine(translate_percent={'x': (-0.1, 0.1), 'y': (-0.1, 0.1)})
-    return aug.augment_image(img)
+    h, w = img.shape[:2]
+    tx = np.random.uniform(-0.1, 0.1) * w
+    ty = np.random.uniform(-0.1, 0.1) * h
+    M = np.float32([[1, 0, tx], [0, 1, ty]])
+    return cv2.warpAffine(img, M, (w, h))
 
 
 def brightness(img):
-    aug = iaa.Multiply((0.4, 1.2))
-    return aug.augment_image(img)
+    return cv2.convertScaleAbs(img, alpha=np.random.uniform(0.4, 1.2))
 
 
-def rotate(img, degrees=8):
-    aug = iaa.Affine(rotate=(-degrees, degrees))
-    return aug.augment_image(img)
+def rotate(img):
+    h, w = img.shape[:2]
+    angle = np.random.uniform(-8, 8)
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+    return cv2.warpAffine(img, M, (w, h))
 
 
 def flip(img, steering):
     return cv2.flip(img, 1), -steering
 
 
-def random_augment(image_path, steering, p=0.5):
-    img = load_image(image_path)
-
-    # Randomly apply augmentations
+def random_augment(img, steering, p=0.5, use_rotate=False):
     if np.random.rand() < p:
         img = pan(img)
     if np.random.rand() < p:
         img = zoom(img)
     if np.random.rand() < p:
         img = brightness(img)
-    if np.random.rand() < p:
+    if use_rotate and np.random.rand() < p:
         img = rotate(img)
     if np.random.rand() < p:
         img, steering = flip(img, steering)
@@ -55,16 +57,15 @@ if __name__ == '__main__':
 
     data = data_loader.load_all(DATA_DIRS)
 
-    # Pick a sample
+    # Pick a random image that has a non-trivial steering angle
     turning = data[data['Steering'].abs() > 0.15]
     row = turning.sample(1, random_state=1).iloc[0]
-    path, angle = row['ImagePath'], row['Steering']
+    angle = row['Steering']
 
-    # 
-    original = load_image(path)
+    # Show the original and each augmentation applied to it, with titles
+    original = load_image(row['ImagePath'])
     flipped, flipped_angle = flip(original, angle)
 
-    # Augmentations
     named = [
         (original, f'original  steering={angle:.3f}'),
         (zoom(original), 'zoom'),
@@ -74,7 +75,6 @@ if __name__ == '__main__':
         (flipped, f'flip  steering={flipped_angle:.3f}'),
     ]
 
-    # batch
     fig, axes = plt.subplots(2, 3, figsize=(14, 6))
     for ax, (img, title) in zip(axes.flatten(), named):
         ax.imshow(img)
@@ -83,18 +83,19 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    #  fully random augmentations
+    # Show a grid of random augmentations of the same original image
     fig, axes = plt.subplots(2, 4, figsize=(16, 5))
     for ax in axes.flatten():
-        img, new_angle = random_augment(path, angle)
+        # Randomly augment the original image, then preprocess it for the model
+        img, new_angle = random_augment(original, angle)
         ax.imshow(img)
         ax.set_title(f'{new_angle:.3f}', fontsize=10)
         ax.axis('off')
     plt.tight_layout()
     plt.show()
 
-    # fix shape
-    img, new_angle = random_augment(path, angle)
+    # Show that the preprocessed output has the right shape and range
+    img, new_angle = random_augment(original, angle)
     out = preProcessing(img)
     print(f'[INFO] augmented -> preprocessed shape {out.shape}, '
           f'range {out.min():.3f} to {out.max():.3f}')
