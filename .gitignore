@@ -4,7 +4,7 @@ IMG/
 driving_log.csv
 
 # Trained models
-*.h5
+#*.h5
 
 # Python
 __pycache__/
