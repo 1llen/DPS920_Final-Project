@@ -97,11 +97,12 @@ def balance_data(data, n_bins=25, samples_per_bin=400, seed=42):
     rng = np.random.default_rng(seed)
     steering = data['Steering'].values
     _, bins = np.histogram(steering, n_bins)
+    bin_index = np.digitize(steering, bins[1:-1]) 
 
     # Determine which data to remove
     remove_list = []
     for i in range(n_bins):
-        in_bin = np.where((steering >= bins[i]) & (steering <= bins[i + 1]))[0]
+        in_bin = np.where(bin_index == i)[0]
         if len(in_bin) > samples_per_bin:
             rng.shuffle(in_bin)
             remove_list.extend(in_bin[samples_per_bin:])
