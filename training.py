@@ -35,8 +35,7 @@ validation_data = load_validation_set(X_test, y_test)
 
 # MODEL
 model = Sequential([
-    layers.Conv2D(24, (5, 5), strides=(2, 2), activation='elu',
-                  input_shape=(66, 200, 3)),
+    layers.Conv2D(24, (5, 5), strides=(2, 2), activation='elu', input_shape=(66, 200, 3)),
     layers.Conv2D(36, (5, 5), strides=(2, 2), activation='elu'),
     layers.Conv2D(48, (5, 5), strides=(2, 2), activation='elu'),
     layers.Conv2D(64, (3, 3), activation='elu'),
@@ -76,10 +75,3 @@ plt.plot(np.arange(0, EPOCHS), H.history['val_loss'], label='val loss')
 plt.legend()
 plt.savefig('loss_curve.png')
 plt.show()
-
-loss = model.evaluate(validation_data[0], validation_data[1])
-baseline = np.mean(validation_data[1] ** 2)
-print(f'validation MSE = {loss}')
-print(f'always-predict-zero MSE = {baseline}')
-
-save_model(model, 'model.h5')
