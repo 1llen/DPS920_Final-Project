@@ -48,13 +48,12 @@ To verify that this pipeline works as expected, a sample size of 3 images is tak
 
 # Augmentation
 
-[TODO] EXPLAIN WHAT AUGMENTATION DOES AND WHY WE DO IT; ADD A TABLE IF NECESSARY. EXPLAIN THAT IT DOESN'T SHOW UP IN VALIDATION, ONLY TRAINING
-
 Augmentation is a way of improving the generalization of a model, by increasing the diversity in a data set without adding new data. For example, you can apply techniques such as flipping, brightness adjustment, zooming, etc. We don't need augmentation in validation because at that stage we are simply measuring the accuracy of the model, not training it further. As well, during validation we want to test the model on real world data, and artificially modifying the images defeats the purpose. 
 
 # Model Architecture
 
-[TODO] SCREENSHOT AND PASTE THE DIAGRAM FROM THE INSTRUCTIONS, AND THEN BRIEFLY DESCRIBE THE PROCESS
+<img width="351" height="502" alt="image" src="https://github.com/user-attachments/assets/f1a40ffa-e8c7-4f7f-8c80-199e6c240715" />
+The model architecture consists of five convolutional layers followed by three fully-connected dense layers. The first three convolutional layers use 5x5 kernels with a (2, 2) stride to downsample the image, followed by two unstrided convolutional layers with 3x3 kernels to capture higher-level spatial details. The resulting feature map is then flattened into 1,164 neurons that are passed through dense layers of 100,50, and 10 neurons, culminating in a final 1-neuron output for vehicle control.
 
 # Training
 
