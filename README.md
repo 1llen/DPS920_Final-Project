@@ -64,6 +64,8 @@ Conversely, the validation set was built using unaugmented preprocessed images t
 The loss curve rapidly decreases in the first three epochs as the model learns basic spatial features such as road borders and lane positions. From epoch 4 onward, the training loss decreases at a more steady pace, eventually flattening out at an error of 0.0062. 
 Validation loss remains lower than training loss consistently through the loss curve, with the biggest difference being in the first three epochs. This is likely due to the model having more trouble with the augmented images in the training data set than the unmodified images in the validation data set. 
 
+<img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/0b9a42b9-0e53-4ef1-9cb5-41b22b97b294" />
+
 # Running the Project
 
 ## Training
