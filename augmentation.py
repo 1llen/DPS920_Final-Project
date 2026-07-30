@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from imgaug import augmenters as iaa
 
 from preprocessing import load_image, preProcessing
 
