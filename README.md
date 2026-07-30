@@ -40,7 +40,11 @@ Even still, there was another bias that was present, which was driving in a stra
 
 # Pre-processing
 
-[TODO] EXPLAIN WHAT HAPPENS DURING PREPROCESSING
+During pre-processing, images are loaded from disk and converted from BGR to RGB, then processed. The pre-processing function operates as follows: The image is then cropped so that only the road area remains, removing unessential elements such as the sky. Then, the image is converted to the YUV color space and resized to 200x66 pixels, the same specs as used by the model. 
+
+To verify that this pipeline works as expected, a sample size of 3 images is taken to display a 3x3 grid of images. The grid has three columns: a column of original images, a column of cropped road sections, and a column of processed images. The final check confirms that the array matches the expected input shape before training. 
+
+
 
 # Augmentation
 
