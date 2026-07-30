@@ -50,6 +50,8 @@ To verify that this pipeline works as expected, a sample size of 3 images is tak
 
 [TODO] EXPLAIN WHAT AUGMENTATION DOES AND WHY WE DO IT; ADD A TABLE IF NECESSARY. EXPLAIN THAT IT DOESN'T SHOW UP IN VALIDATION, ONLY TRAINING
 
+Augmentation is a way of improving the generalization of a model, by increasing the diversity in a data set without adding new data. For example, you can apply techniques such as flipping, brightness adjustment, zooming, etc. We don't need augmentation in validation because at that stage we are simply measuring the accuracy of the model, not training it further. As well, during validation we want to test the model on real world data, and artificially modifying the images defeats the purpose. 
+
 # Model Architecture
 
 [TODO] SCREENSHOT AND PASTE THE DIAGRAM FROM THE INSTRUCTIONS, AND THEN BRIEFLY DESCRIBE THE PROCESS
