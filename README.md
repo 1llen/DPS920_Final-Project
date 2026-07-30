@@ -57,7 +57,12 @@ The model architecture consists of five convolutional layers followed by three f
 
 # Training
 
-[TODO] EXPLAIN THE PROCESS OF TRAINING (AND VALIDATION); EXPLAIN THE LOSS CURVE.
+The model was trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.0001. Training was conducted over 15 epochs with 300 steps per epoch and a batch size of 100. 
+During training, the batches were streamed dynamically by the batch generator, applying augmentation on the data set before passing images through the preprocessing pipeline. 
+Conversely, the validation set was built using unaugmented preprocessed images to evaluate the model's performance in real world conditions.
+
+The loss curve rapidly decreases in the first three epochs as the model learns basic spatial features such as road borders and lane positions. From epoch 4 onward, the training loss decreases at a more steady pace, eventually flattening out at an error of 0.0062. 
+Validation loss remains lower than training loss consistently through the loss curve, with the biggest difference being in the first three epochs. This is likely due to the model having more trouble with the augmented images in the training data set than the unmodified images in the validation data set. 
 
 # Running the Project
 
