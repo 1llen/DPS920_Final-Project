@@ -1,0 +1,27 @@
+name: venv_CV-Project
+
+channels:
+    - defaults
+
+dependencies:
+    - python=3.10
+    - pip
+    - pip:
+          - tensorflow==2.15.1
+          - numpy<2
+          - pandas==2.2.3
+          - scipy==1.14.1
+          - scikit-learn==1.5.2
+          - scikit-image==0.24.0
+          - opencv-python==4.10.0.84
+          - matplotlib==3.9.2
+          - pillow==11.0.0
+          - flask==1.1.4
+          - werkzeug==1.0.1
+          - jinja2==2.11.3
+          - itsdangerous==1.1.0
+          - markupsafe==2.0.1
+          - python-socketio==4.6.1
+          - python-engineio==3.13.2
+          - flask-socketio==4.3.2
+          - eventlet==0.33.3
