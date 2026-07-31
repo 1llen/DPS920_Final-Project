@@ -20,8 +20,6 @@ pip install flask==1.1.2 werkzeug==2.0.1 jinja2==3.0.1 itsdangerous==2.0.1 marku
 
 # Project Structure
 
-## 4. Project structure
-
 ```
 project/
   data_forward/            # forward-direction recording
@@ -68,15 +66,13 @@ Combining the two datasets resulted in a mean turning angle of just 0.0006 degre
 
 Even still, there was another bias that was present, which was driving in a straight line, with a driving angle of 0 degrees. Similar to the diabetes problem we examined in class, if we leave the data like this, a network which completely ignores the image and always outputs a steering angle of 0 would seemingly appear to be a success, despite being completely incorrect. To correct this, we divided out data into bins of steering ranges, and limited each bin to only 400 samples, randomly discarding down to 400 if they exceed it. This resulted in reducing the sample size of 9364 down to 2762, only 30% of the actual full data set.
 
-[TODO] ATTACH IMAGE OF GRAPHS
+![balancing.png](./balancing.png "Balancing Historgram")
 
 # Pre-processing
 
 During pre-processing, images are loaded from disk and converted from BGR to RGB, then processed. The pre-processing function operates as follows: The image is then cropped so that only the road area remains, removing unessential elements such as the sky. Then, the image is converted to the YUV color space and resized to 200x66 pixels, the same specs as used by the model. 
 
 To verify that this pipeline works as expected, a sample size of 3 images is taken to display a 3x3 grid of images. The grid has three columns: a column of original images, a column of cropped road sections, and a column of processed images. The final check confirms that the array matches the expected input shape before training. 
-
-
 
 # Augmentation
 
@@ -95,6 +91,7 @@ Conversely, the validation set was built using unaugmented preprocessed images t
 
 The loss curve rapidly decreases in the first three epochs as the model learns basic spatial features such as road borders and lane positions. From epoch 4 onward, the training loss decreases at a more steady pace, eventually flattening out at an error of 0.0062. 
 Validation loss remains lower than training loss consistently through the loss curve, with the biggest difference being in the first three epochs. This is likely due to the model having more trouble with the augmented images in the training data set than the unmodified images in the validation data set. 
+</br>
 
 <img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/0b9a42b9-0e53-4ef1-9cb5-41b22b97b294" />
 
@@ -102,7 +99,9 @@ Validation loss remains lower than training loss consistently through the loss c
 
 ## Training
 
-[TODO]
+`training.py` loads both recording sessions via `dataloader.py` which balances the steering distribution, and then augments the training data via `augmentation.py`, before training and writing `model.h5` and `loss_curve.png`. Additionally, it also prints the final validation MSE alongside the MSE of a model that always outputs zero. If the model does not beat that baseline, it has not learned to use the image and the training has failed.
+
+The adjustable constants at the top of the file are: `DATA_DIRS`, `SAMPLES_PER_BIN`, `BATCH_SIZE`, `STEPS_PER_EPOCH`, `EPOCHS`.
 
 ```
 python.exe training.py
@@ -110,11 +109,16 @@ python.exe training.py
 
 # Testing in the simulator
 
+First, the testing script must be ran:
+
 ```
 python TestSimulation.py
 ```
 
-[TODO] And then open the simulator
+Then launch `beta_simulator.exe`, using the same graphics settings as data collection (640×480, Fastest, Windowed) and select Autonomous Mode.
+The server listens on port 4567; the simulator prints `Connected` when the handshake succeeds.
+
+The model predicts steering only and has no influence on speed, as the speed is set to 10 MPH in `testsimulation.py`.
 
 # Results
 
