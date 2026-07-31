@@ -20,6 +20,38 @@ pip install flask==1.1.2 werkzeug==2.0.1 jinja2==3.0.1 itsdangerous==2.0.1 marku
 
 # Project Structure
 
+## 4. Project structure
+
+```
+project/
+  data_forward/            # forward-direction recording
+    driving_log.csv
+    IMG/
+  data_reverse/            # reverse-direction recording
+    driving_log.csv
+    IMG/
+
+  data_loader.py           # loading and balancing data
+  preprocessing.py         # crop / YUV / blur / resize / normalise
+  augmentation.py          # pan, zoom, brightness, flip, and rotate training data
+  generator.py             # train/validation split and batch generator
+  training.py              # model training loop
+
+  TestSimulation.py        # provided testing code, left unmodified
+  model.h5                 # trained model
+```
+
+The recording folders are excluded from version control since they are exceptionally large, and were shared by compressing and uploading them for developers to download.
+
+Each module can be ran directly to verify its own stage:
+
+| Command | Verifies |
+|---|---|
+| `python data_loader.py` | Steering histograms before and after balancing |
+| `python preprocessing.py` | Crop bounds and output shape |
+| `python augmentation.py` | Each transformation |
+| `python generator.py` | Batch shapes, augmented vs clean batches, throughput |
+
 # Data Collection
 
 Data was collected using the provided simulator from Udacity. We manually drove around the track using mouse controls, and split the recording into 2 sessions: forward and reverse. This is because the track had a bias towards turns in one direction since it was a loop, so to balance that out, we needed to also drive the opposite way. The two sessions were recorded into two separate folders:
@@ -86,9 +118,17 @@ python TestSimulation.py
 
 # Results
 
+[TODO]
+
 # Challenges
+
+[TODO]
 
 ## Colour space conversion
 
+[TODO]
+
 ## Training time
+
+[TODO]
 
