@@ -88,7 +88,7 @@ The model architecture consists of five convolutional layers followed by three f
 
 # Training
 
-The model was trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.0001. Training was conducted over 15 epochs with 300 steps per epoch and a batch size of 100. 
+The model was trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.0001. Training was initially conducted over 15 epochs with 300 steps per epoch and a batch size of 100, but then changed to 50epochs with 100 steps per epoch to experiment. This nearly doubled the training time, despite the number of steps being nearly the same (4500 vs 5000). It did, however, result in a significantly better performance, allowing us to test the simulator at 30 MPH rather than 10. 
 
 During training, the batches were streamed dynamically by the batch generator, applying augmentation on the data set before passing images through the preprocessing pipeline.  Conversely, the validation set was built using unaugmented preprocessed images to evaluate the model's performance in real world conditions.
 
@@ -125,7 +125,7 @@ The model predicts steering only and has no influence on speed, as the speed is 
 
 # Results
 
-A video of the resulting model driving can be found [uploaded to youtube](https://youtu.be/FiUycL_BJKs). It is able to complete the laps consistently, though it will occasionally be driving on the line or slightly over
+A video of the first model driving can be found [uploaded to youtube](https://youtu.be/FiUycL_BJKs). It is able to complete the laps consistently, though it will occasionally be driving on the line or slightly over. When changing the max speed to 30MPH, it does have some difficulties staying on the road, driving off of it and having no training to recover it. The second model, however, does not have this same difficulty, and drives around the track with no issues at 30MPH. Despite the training data being the same, and the number of total steps not being very different, the resulting model performs significantly better. A video of the second model driving can be found [here](https://youtu.be/WgtAWcQuBHw).
 
 # Challenges
 

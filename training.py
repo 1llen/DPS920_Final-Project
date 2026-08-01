@@ -15,8 +15,8 @@ from generator import split_data, load_images, batch_generator, load_validation_
 DATA_DIRS = ['data_forward', 'data_reverse']
 SAMPLES_PER_BIN = 400
 BATCH_SIZE = 100
-STEPS_PER_EPOCH = 300
-EPOCHS = 15
+STEPS_PER_EPOCH = 100
+EPOCHS = 50
 
 # DATA
 data = data_loader.load_all(DATA_DIRS)
