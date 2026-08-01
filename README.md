@@ -125,7 +125,7 @@ The model predicts steering only and has no influence on speed, as the speed is 
 
 # Results
 
-A video of the first model driving can be found [uploaded to youtube](https://youtu.be/FiUycL_BJKs). It is able to complete the laps consistently, though it will occasionally be driving on the line or slightly over. When changing the max speed to 30MPH, it does have some difficulties staying on the road, driving off of it and having no training to recover it. The second model, however, does not have this same difficulty, and drives around the track with no issues at 30MPH. Despite the training data being the same, and the number of total steps not being very different, the resulting model performs significantly better. A video of the second model driving can be found [here](link). [TODO] RECORD VIDEO AND INSERT LINK
+A video of the first model driving can be found [uploaded to youtube](https://youtu.be/FiUycL_BJKs). It is able to complete the laps consistently, though it will occasionally be driving on the line or slightly over. When changing the max speed to 30MPH, it does have some difficulties staying on the road, driving off of it and having no training to recover it. The second model, however, does not have this same difficulty, and drives around the track with no issues at 30MPH. Despite the training data being the same, and the number of total steps not being very different, the resulting model performs significantly better. A video of the second model driving can be found [here](https://youtu.be/WgtAWcQuBHw).
 
 # Challenges
 
