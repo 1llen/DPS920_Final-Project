@@ -123,6 +123,26 @@ The server listens on port 4567; the simulator prints `Connected` when the hands
 
 The model predicts steering only and has no influence on speed, as the speed is set to 10 MPH in `testsimulation.py`.
 
+# Model architecture experiments
+
+To assess the hypothetical accuracy/loss limit of the model, a series of experiments that involved hyperparameters, model architecture, and training configuration were conducted.
+
+Model variations included the following changes:
+
+- Activation function swap from ELU to SiLU
+- Data batching approach change, ensuring that similar frames (sequential frames) stay together and do not spread across both training and validation sets
+- Model capacity increase in convolutional and fully connected parts
+- Introduction of Dropout and Spatial Dropout layers to reduce overfitting and improve generalizability
+- BatchNormalization to improve the model’s stability
+- Dynamic Learning Rate scheduling with various patience values
+- An AdamW optimizer with the weight decay setting
+
+After numerous experiments, the results were inconclusive, indicating that model and training alterations do not yield meaningful improvements relative to the previously established MSE loss of approximately `0.005`. The best training results from the altered models yielded losses ranging from `0.004` to `0.0049`.
+
+Alternative training and model approach, along with the results, can be found in `training_alt.py`, `loss_curve_alt.png`, and `model_alt.h5`.
+
+The extensive experimentation with the model and training hyperparameters and approaches leads to a plausible conclusion that the accurracy/loss bottleneck at this stage is not in the model. Hence, increasing the number of parameters and/or the length of training will likely not yield any substantial improvements. Instead, the model’s accuracy is limited by the variety, balance, and amount of data.
+
 # Results
 
 [TODO]
