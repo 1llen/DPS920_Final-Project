@@ -59,15 +59,27 @@ model = Sequential([
 
     layers.Flatten(),
 
-    layers.Dense(100),
+    layers.Dense(256),
 	layers.BatchNormalization(),
 	layers.ELU(),
+    layers.Dropout(0.15),
 
-    layers.Dense(50),
+	layers.Dense(256),
 	layers.BatchNormalization(),
 	layers.ELU(),
+    layers.Dropout(0.15),
 
-    layers.Dense(10, activation='elu'),
+    layers.Dense(128),
+	layers.BatchNormalization(),
+	layers.ELU(),
+    layers.Dropout(0.1),
+
+	layers.Dense(64),
+	layers.BatchNormalization(),
+	layers.ELU(),
+    layers.Dropout(0.05),
+
+    layers.Dense(32, activation='elu'),
     layers.Dense(1)
 ])
 
@@ -86,11 +98,15 @@ opt = AdamW(learning_rate=0.002, weight_decay=0.004)
 model.compile(optimizer=opt,
 			  loss=weighted_mse,
               metrics=['mse'])
+callback = tf.keras.callbacks.ReduceLROnPlateau(
+    monitor='val_mse', factor=0.5, patience=1, min_lr=1e-6
+)
 
 H = model.fit(train_generator,
               steps_per_epoch=STEPS_PER_EPOCH,
               validation_data=validation_data,
               epochs=EPOCHS,
+              callbacks=[callback],
               verbose=2)
 
 
