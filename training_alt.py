@@ -8,11 +8,10 @@ import matplotlib.pyplot as plt
 from tensorflow.keras import Sequential, layers, regularizers
 from tensorflow.keras.models import save_model
 # Using legacy to speed up training on Mac
-from tensorflow.keras.optimizers.legacy import Adam
+from tensorflow.keras.optimizers import AdamW
 
 import data_loader
 from generator import split_data, load_images, batch_generator, load_validation_set
-
 
 DATA_DIRS = ['data_forward', 'data_reverse']
 SAMPLES_PER_BIN = 400
@@ -36,20 +35,18 @@ validation_data = load_validation_set(X_test, y_test)
 
 # MODEL
 model = Sequential([
-    layers.Conv2D(24, (3, 3), input_shape=(66, 200, 3)),
-	layers.BatchNormalization(),
-	layers.ELU(),
-	layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(24, (3, 3), strides=(2, 2), input_shape=(66, 200, 3), activation="elu"),
+    layers.SpatialDropout2D(rate=0.1),
 
-    layers.Conv2D(36, (3, 3)),
+    layers.Conv2D(36, (3, 3), strides=(2, 2)),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.MaxPooling2D((2, 2)),
+    layers.SpatialDropout2D(rate=0.1),
 
-    layers.Conv2D(48, (3, 3)),
+    layers.Conv2D(48, (3, 3), strides=(2, 2)),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.MaxPooling2D((2, 2)),
+    layers.SpatialDropout2D(rate=0.1),
 
     layers.Conv2D(64, (3, 3)),
 	layers.BatchNormalization(),
@@ -64,12 +61,10 @@ model = Sequential([
     layers.Dense(100),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.Dropout(0.15),
 
     layers.Dense(50),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.Dropout(0.1),
 
     layers.Dense(10, activation='elu'),
     layers.Dense(1)
@@ -78,7 +73,7 @@ model = Sequential([
 model.summary()
 
 # TRAIN
-opt = Adam(learning_rate=0.0005)
+opt = AdamW(learning_rate=0.001, weight_decay=0.004)
 model.compile(optimizer=opt,
               loss='mse')
 
