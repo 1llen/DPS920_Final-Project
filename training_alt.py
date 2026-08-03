@@ -9,6 +9,7 @@ from tensorflow.keras import Sequential, layers, regularizers
 from tensorflow.keras.models import save_model
 # Using legacy to speed up training on Mac
 from tensorflow.keras.optimizers import AdamW
+import tensorflow as tf
 
 import data_loader
 from generator import split_data, load_images, batch_generator, load_validation_set
@@ -72,10 +73,19 @@ model = Sequential([
 
 model.summary()
 
+# CUSTOM LOSS 
+
+def weighted_mse(y_true, y_pred):
+    # Penalizing values close to zero
+    weights = 1.0 + 5.0 * tf.abs(y_true)
+    squared_error = tf.square(y_true - y_pred)
+    return tf.reduce_mean(weights * squared_error)
+
 # TRAIN
 opt = AdamW(learning_rate=0.001, weight_decay=0.004)
 model.compile(optimizer=opt,
-              loss='mse')
+			  loss=weighted_mse,
+              metrics=['mse'])
 
 
 H = model.fit(train_generator,
@@ -88,13 +98,19 @@ H = model.fit(train_generator,
 # EVALUATE
 save_model(model, 'model_alt.h5')
 
-loss = model.evaluate(validation_data[0], validation_data[1])
-baseline = np.mean(validation_data[1] ** 2)
-print(f'validation MSE = {loss}')
-print(f'always-predict-zero MSE = {baseline}')
+results = model.evaluate(validation_data[0], validation_data[1], return_dict=True)
 
-plt.plot(np.arange(0, EPOCHS), H.history['loss'], label='loss')
-plt.plot(np.arange(0, EPOCHS), H.history['val_loss'], label='val loss')
+validation_mse = results["mse"]
+baseline_mse = np.mean(validation_data[1] ** 2)
+
+print(f"validation MSE = {validation_mse}")
+print(f"weighted validation loss = {results['loss']}")
+print(f"always-predict-zero MSE = {baseline_mse}")
+
+plt.plot(np.arange(0, EPOCHS), H.history["mse"], label="training MSE")
+plt.plot(np.arange(0, EPOCHS), H.history["val_mse"], label="validation MSE")
+plt.xlabel("Epoch")
+plt.ylabel("Plain MSE")
 plt.legend()
-plt.savefig('loss_curve_alt.png')
+plt.savefig("loss_curve_alt.png")
 plt.show()
