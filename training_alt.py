@@ -49,11 +49,11 @@ model = Sequential([
 	layers.ELU(),
     layers.SpatialDropout2D(rate=0.1),
 
-    layers.Conv2D(64, (3, 3)),
+    layers.Conv2D(96, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
 	
-    layers.Conv2D(64, (3, 3)),
+    layers.Conv2D(128, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
 
@@ -82,11 +82,10 @@ def weighted_mse(y_true, y_pred):
     return tf.reduce_mean(weights * squared_error)
 
 # TRAIN
-opt = AdamW(learning_rate=0.001, weight_decay=0.004)
+opt = AdamW(learning_rate=0.002, weight_decay=0.004)
 model.compile(optimizer=opt,
 			  loss=weighted_mse,
               metrics=['mse'])
-
 
 H = model.fit(train_generator,
               steps_per_epoch=STEPS_PER_EPOCH,
