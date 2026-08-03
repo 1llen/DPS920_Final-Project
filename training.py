@@ -10,7 +10,7 @@ from tensorflow.keras.models import save_model
 from tensorflow.keras.optimizers import Adam
 
 import data_loader
-from generator import split_data, load_images, batch_generator, load_validation_set
+from generator import split_data_random, load_images, batch_generator, load_validation_set
 
 
 DATA_DIRS = ['data_forward', 'data_reverse']
@@ -25,13 +25,12 @@ data = data_loader.load_all(DATA_DIRS)
 data_loader.check_images(data)
 data = data_loader.balance_data(data, samples_per_bin=SAMPLES_PER_BIN)
 
-X_train, X_test, y_train, y_test = split_data(data)
+X_train, X_test, y_train, y_test = split_data_random(data)
 
 # Images
 train_images = load_images(X_train)
 train_generator = batch_generator(train_images, y_train, BATCH_SIZE, True)
 validation_data = load_validation_set(X_test, y_test)
-
 
 # MODEL
 model = Sequential([
