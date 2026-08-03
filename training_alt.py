@@ -7,7 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras import Sequential, layers, regularizers
 from tensorflow.keras.models import save_model
-from tensorflow.keras.optimizers import Adam
+# Using legacy to speed up training on Mac
+from tensorflow.keras.optimizers.legacy import Adam
 
 import data_loader
 from generator import split_data, load_images, batch_generator, load_validation_set
@@ -35,37 +36,40 @@ validation_data = load_validation_set(X_test, y_test)
 
 # MODEL
 model = Sequential([
-    layers.Conv2D(24, (5, 5), strides=(2, 2), kernel_regularizer=regularizers.L2(0.0001), input_shape=(66, 200, 3)),
+    layers.Conv2D(24, (3, 3), input_shape=(66, 200, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
+	layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(36, (5, 5), strides=(2, 2), kernel_regularizer=regularizers.L2(0.0001)),
+    layers.Conv2D(36, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
+	layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(48, (5, 5), strides=(2, 2), kernel_regularizer=regularizers.L2(0.0001)),
+    layers.Conv2D(48, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
+	layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.L2(0.0001)),
+    layers.Conv2D(64, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
 	
-    layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.L2(0.0001)),
+    layers.Conv2D(64, (3, 3)),
 	layers.BatchNormalization(),
 	layers.ELU(),
 
     layers.Flatten(),
 
-    layers.Dense(100, activation='elu'),
+    layers.Dense(100),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.Dropout(0.3),
+	layers.Dropout(0.15),
 
-    layers.Dense(50, activation='elu'),
+    layers.Dense(50),
 	layers.BatchNormalization(),
 	layers.ELU(),
-	layers.Dropout(0.2),
+	layers.Dropout(0.1),
 
     layers.Dense(10, activation='elu'),
     layers.Dense(1)
@@ -74,7 +78,7 @@ model = Sequential([
 model.summary()
 
 # TRAIN
-opt = Adam(learning_rate=0.0001)
+opt = Adam(learning_rate=0.0005)
 model.compile(optimizer=opt,
               loss='mse')
 
