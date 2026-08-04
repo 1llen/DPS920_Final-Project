@@ -6,13 +6,45 @@ from sklearn.model_selection import train_test_split
 from preprocessing import load_image, preProcessing
 from augmentation import random_augment
 
+# Magic number :)
+FRAME_TIME = 70
 
-def split_data(data, test_size=0.2, random_state=42):
+def split_data_random(data, test_size=0.2, random_state=42):
     X = data['ImagePath'].values
     y = data['Steering'].values
 
     X_train, X_valid, y_train, y_valid = train_test_split(
         X, y, test_size=test_size, random_state=random_state)
+
+    print(f'[INFO] train={len(X_train)}  validation={len(X_valid)}')
+    return X_train, X_valid, y_train, y_valid
+
+def split_data(data, test_size=0.2, random_state=42):
+    frames_per_block = 2000 // FRAME_TIME
+    frame_blocks = len(data) // frames_per_block
+
+    # split data into blocks of around 2 seconds
+    blocks = np.array_split(np.arange(len(data)), frame_blocks)
+
+    # shuffle the blocks
+    rng = np.random.default_rng(random_state)
+    block_order = rng.permutation(len(blocks))
+
+    split_idx = int(frame_blocks * (1 - test_size))
+
+    # get train and validation splits
+    train_blocks = block_order[:split_idx]
+    valid_blocks = block_order[split_idx:]
+
+    # get data indices
+    train_indices = np.concatenate([blocks[i] for i in train_blocks])
+    valid_indices = np.concatenate([blocks[i] for i in valid_blocks])
+
+    train_data = data.iloc[train_indices]
+    valid_data = data.iloc[valid_indices]
+
+    X_train, y_train = train_data['ImagePath'].values, train_data['Steering'].values
+    X_valid, y_valid = valid_data['ImagePath'].values, valid_data['Steering'].values
 
     print(f'[INFO] train={len(X_train)}  validation={len(X_valid)}')
     return X_train, X_valid, y_train, y_valid

@@ -7,6 +7,9 @@ We created an environment using conda and the provided package requirements file
 ```
 conda create --name venv_CV-Project --file .\package_list.txt
 
+# MacOS
+conda env create --prefix ./venv_CV-Project --file environment-macos.yml
+
 conda activate venv_CV-Project
 ```
 
@@ -43,22 +46,22 @@ The recording folders are excluded from version control since they are exception
 
 Each module can be ran directly to verify its own stage:
 
-| Command | Verifies |
-|---|---|
-| `python data_loader.py` | Steering histograms before and after balancing |
-| `python preprocessing.py` | Crop bounds and output shape |
-| `python augmentation.py` | Each transformation |
-| `python generator.py` | Batch shapes, augmented vs clean batches, throughput |
+| Command                   | Verifies                                             |
+| ------------------------- | ---------------------------------------------------- |
+| `python data_loader.py`   | Steering histograms before and after balancing       |
+| `python preprocessing.py` | Crop bounds and output shape                         |
+| `python augmentation.py`  | Each transformation                                  |
+| `python generator.py`     | Batch shapes, augmented vs clean batches, throughput |
 
 # Data Collection
 
 Data was collected using the provided simulator from Udacity. We manually drove around the track using mouse controls, and split the recording into 2 sessions: forward and reverse. This is because the track had a bias towards turns in one direction since it was a loop, so to balance that out, we needed to also drive the opposite way. The two sessions were recorded into two separate folders:
 
-| Session | Frames | Left | Right |
-|---|---|---|---|
-| `data_forward` | 4,494 | 60.9% | 7.4% |
-| `data_reverse` | 4,900 | 12.6% | 65.3% |
-| Combined | 9,394 | 35.7% | 37.6% |
+| Session        | Frames | Left  | Right |
+| -------------- | ------ | ----- | ----- |
+| `data_forward` | 4,494  | 60.9% | 7.4%  |
+| `data_reverse` | 4,900  | 12.6% | 65.3% |
+| Combined       | 9,394  | 35.7% | 37.6% |
 
 Combining the two datasets resulted in a mean turning angle of just 0.0006, effectively now symmetric. We were told to use mouse input since it allowed for a continuous range of inputs for turning, and it resulted in over 100 distinct steering values.
 
@@ -70,13 +73,13 @@ Even still, there was another bias that was present, which was driving in a stra
 
 # Pre-processing
 
-During pre-processing, images are loaded from disk and converted from BGR to RGB, then processed. The pre-processing function operates as follows: The image is then cropped so that only the road area remains, removing unessential elements such as the sky. Then, the image is converted to the YUV color space and resized to 200x66 pixels, the same specs as used by the model. 
+During pre-processing, images are loaded from disk and converted from BGR to RGB, then processed. The pre-processing function operates as follows: The image is then cropped so that only the road area remains, removing unessential elements such as the sky. Then, the image is converted to the YUV color space and resized to 200x66 pixels, the same specs as used by the model.
 
-To verify that this pipeline works as expected, a sample size of 3 images is taken to display a 3x3 grid of images. The grid has three columns: a column of original images, a column of cropped road sections, and a column of processed images. The final check confirms that the array matches the expected input shape before training. 
+To verify that this pipeline works as expected, a sample size of 3 images is taken to display a 3x3 grid of images. The grid has three columns: a column of original images, a column of cropped road sections, and a column of processed images. The final check confirms that the array matches the expected input shape before training.
 
 # Augmentation
 
-Augmentation is a way of improving the generalization of a model, by increasing the diversity in a data set without adding new data. For example, you can apply techniques such as flipping, brightness adjustment, zooming, etc. We don't need augmentation in validation because at that stage we are simply measuring the accuracy of the model, not training it further. As well, during validation we want to test the model on real world data, and artificially modifying the images defeats the purpose. 
+Augmentation is a way of improving the generalization of a model, by increasing the diversity in a data set without adding new data. For example, you can apply techniques such as flipping, brightness adjustment, zooming, etc. We don't need augmentation in validation because at that stage we are simply measuring the accuracy of the model, not training it further. As well, during validation we want to test the model on real world data, and artificially modifying the images defeats the purpose.
 
 # Model Architecture
 
@@ -122,6 +125,26 @@ Then launch `beta_simulator.exe`, using the same graphics settings as data colle
 The server listens on port 4567; the simulator prints `Connected` when the handshake succeeds.
 
 The model predicts steering only and has no influence on speed, as the speed is set to 10 MPH in `testsimulation.py`.
+
+# Model architecture experiments
+
+To assess the hypothetical accuracy/loss limit of the model, a series of experiments that involved hyperparameters, model architecture, and training configuration were conducted.
+
+Model variations included the following changes:
+
+- Activation function swap from ELU to SiLU
+- Data batching approach change, ensuring that similar frames (sequential frames) stay together and do not spread across both training and validation sets
+- Model capacity increase in convolutional and fully connected parts
+- Introduction of Dropout and Spatial Dropout layers to reduce overfitting and improve generalizability
+- BatchNormalization to improve the model’s stability
+- Dynamic Learning Rate scheduling with various patience values
+- An AdamW optimizer with the weight decay setting
+
+After numerous experiments, the results were inconclusive, indicating that model and training alterations do not yield meaningful improvements relative to the previously established MSE loss of approximately `0.005`. The best training results from the altered models yielded losses ranging from `0.004` to `0.0049`.
+
+Alternative training and model approach, along with the results, can be found in `training_alt.py`, `loss_curve_alt.png`, and `model_alt.h5`.
+
+The extensive experimentation with the model and training hyperparameters and approaches leads to a plausible conclusion that the accurracy/loss bottleneck at this stage is not in the model. Hence, increasing the number of parameters and/or the length of training will likely not yield any substantial improvements. Instead, the model’s accuracy is limited by the variety, balance, and amount of data.
 
 # Results
 
