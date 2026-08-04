@@ -1,6 +1,11 @@
 import os
+
 print('Setting Up ...')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_DISABLE_MKL'] = '1'
+os.environ['OMP_NUM_THREADS'] = '8'
+os.environ['KMP_BLOCKTIME'] = '0'
+
 import socketio
 import eventlet
 import numpy as np
@@ -13,7 +18,7 @@ import cv2
 
 sio = socketio.Server()
 app = Flask(__name__) #__main__
-maxSpeed = 10
+maxSpeed = 30
 
 def preProcessing(img):
     img = img[60:135, :, :]

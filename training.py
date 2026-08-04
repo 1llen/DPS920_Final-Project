@@ -12,13 +12,11 @@ from tensorflow.keras.optimizers import Adam
 import data_loader
 from generator import split_data_random, load_images, batch_generator, load_validation_set
 
-
 DATA_DIRS = ['data_forward', 'data_reverse']
 SAMPLES_PER_BIN = 400
 BATCH_SIZE = 100
-STEPS_PER_EPOCH = 300
-EPOCHS = 15
-
+STEPS_PER_EPOCH = 100
+EPOCHS = 50
 
 # DATA
 data = data_loader.load_all(DATA_DIRS)
@@ -50,16 +48,13 @@ model.summary()
 
 # TRAIN
 opt = Adam(learning_rate=0.0001)
-model.compile(optimizer=opt,
-              loss='mse')
-
+model.compile(optimizer=opt, loss='mse')
 
 H = model.fit(train_generator,
               steps_per_epoch=STEPS_PER_EPOCH,
               validation_data=validation_data,
               epochs=EPOCHS,
-              verbose=2)
-
+              verbose=1)
 
 # EVALUATE
 save_model(model, 'model.h5')
