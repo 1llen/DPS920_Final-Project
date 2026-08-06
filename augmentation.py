@@ -31,10 +31,35 @@ def rotate(img):
 
 
 def flip(img, steering):
+    """Mirror the image horizontally and negate the steering angle to match.
+
+    Args:
+        img: The image to flip.
+        steering: The steering angle associated with the image.
+
+    Returns:
+        A tuple of the horizontally flipped image and the negated steering
+        angle (a left turn in the mirrored frame is a right turn in reality).
+    """
     return cv2.flip(img, 1), -steering
 
 
 def random_augment(img, steering, p=0.5, use_rotate=False):
+    """Apply a random subset of augmentations to an image/steering pair.
+
+    Each of pan, zoom, brightness, optional rotate, and flip is applied
+    independently with probability `p`.
+
+    Args:
+        img: The image to augment.
+        steering: The steering angle associated with the image.
+        p: The probability of applying each individual augmentation.
+        use_rotate: Whether the rotate augmentation is eligible to be applied.
+
+    Returns:
+        A tuple of the augmented image and the steering angle updated to
+        match (only the flip augmentation changes it).
+    """
     if np.random.rand() < p:
         img = pan(img)
     if np.random.rand() < p:
