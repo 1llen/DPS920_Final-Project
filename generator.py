@@ -10,6 +10,21 @@ from augmentation import random_augment
 FRAME_TIME = 70
 
 def split_data_random(data, test_size=0.2, random_state=42):
+    """Split data into train/validation sets by shuffling individual rows.
+
+    Since driving frames are temporally correlated, this i.i.d. split can
+    leak near-duplicate frames between train and validation; see split_data
+    for a block-based alternative that avoids this.
+
+    Args:
+        data: A DataFrame with `ImagePath` and `Steering` columns.
+        test_size: Fraction of rows to hold out for validation.
+        random_state: Random seed controlling the shuffle.
+
+    Returns:
+        A tuple (X_train, X_valid, y_train, y_valid) of image paths and
+        steering angles.
+    """
     X = data['ImagePath'].values
     y = data['Steering'].values
 
@@ -20,6 +35,23 @@ def split_data_random(data, test_size=0.2, random_state=42):
     return X_train, X_valid, y_train, y_valid
 
 def split_data(data, test_size=0.2, random_state=42):
+    """Split data into train/validation sets by shuffling contiguous blocks of frames.
+
+    Groups consecutive frames into ~2-second blocks and assigns whole blocks
+    to train or validation, rather than shuffling individual frames. This
+    keeps temporally adjacent (near-duplicate) frames on the same side of
+    the split, avoiding the leakage that split_data_random is prone to.
+
+    Args:
+        data: A DataFrame with `ImagePath` and `Steering` columns, in
+            recording order.
+        test_size: Fraction of blocks to hold out for validation.
+        random_state: Random seed controlling the block shuffle.
+
+    Returns:
+        A tuple (X_train, X_valid, y_train, y_valid) of image paths and
+        steering angles.
+    """
     frames_per_block = 2000 // FRAME_TIME
     frame_blocks = len(data) // frames_per_block
 
@@ -58,6 +90,22 @@ def load_images(image_paths):
 
 
 def batch_generator(images, steerings, batch_size, is_training):
+    """Infinitely yield randomly sampled, preprocessed batches for training or validation.
+
+    Images are sampled with replacement on every batch. When `is_training`
+    is True, each sampled image/steering pair is randomly augmented before
+    preprocessing; otherwise it is preprocessed as-is.
+
+    Args:
+        images: In-memory list of raw (RGB) images to sample from.
+        steerings: Steering angles aligned with `images`.
+        batch_size: Number of samples to yield per batch.
+        is_training: Whether to apply random augmentation to sampled images.
+
+    Yields:
+        A tuple (batch_images, batch_steerings) of float32 arrays, with
+        `batch_images` shaped (batch_size, 66, 200, 3).
+    """
     while True:
         batch_images = []
         batch_steerings = []
@@ -78,6 +126,16 @@ def batch_generator(images, steerings, batch_size, is_training):
 
 
 def load_validation_set(image_paths, steerings):
+    """Load and preprocess a fixed validation set (no augmentation, no sampling).
+
+    Args:
+        image_paths: Paths to the validation images.
+        steerings: Steering angles aligned with `image_paths`.
+
+    Returns:
+        A tuple (images, steerings) of float32 arrays, with `images` shaped
+        (len(image_paths), 66, 200, 3).
+    """
     images = [preProcessing(load_image(p)) for p in image_paths]
     print(f'[INFO] validation set built: {len(images)} images')
 

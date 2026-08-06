@@ -12,6 +12,14 @@ def load_image(path):
 
 
 def preProcessing(img):
+    """Crop, recolor, blur, resize, and normalize a raw RGB frame for the model.
+
+    Args:
+        img: An RGB image, as returned by load_image.
+
+    Returns:
+        A (66, 200, 3) YUV image with pixel values normalized to 0-1.
+    """
     # convert to YUV
     img = img[60:135, :, :]
     img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
