@@ -12,6 +12,16 @@ def get_filename(path):
 
 
 def load_log(csv_path, image_dir=None):
+    """Load a single driving_log.csv into a DataFrame of image paths and steering angles.
+
+    Args:
+        csv_path: Path to a driving_log.csv (headerless, columns per COLUMNS).
+        image_dir: Directory containing the logged images. Defaults to an
+            `IMG` folder alongside the CSV.
+
+    Returns:
+        A DataFrame with `ImagePath` and `Steering` columns.
+    """
     csv_path = os.path.abspath(csv_path)
     # If no image_dir is provided, assume images are in the same directory as the CSV file
     if image_dir is None:
@@ -34,6 +44,15 @@ def load_log(csv_path, image_dir=None):
 
 
 def load_all(data_dirs):
+    """Load and concatenate the driving_log.csv from each session directory.
+
+    Args:
+        data_dirs: Directories, each containing a driving_log.csv.
+
+    Returns:
+        A single DataFrame combining all sessions' `ImagePath` and
+        `Steering` columns.
+    """
     frames = []
     for d in data_dirs:
         frames.append(load_log(os.path.join(d, 'driving_log.csv')))
@@ -44,6 +63,14 @@ def load_all(data_dirs):
 
 
 def check_images(data):
+    """Verify that every image referenced in the data actually exists on disk.
+
+    Args:
+        data: A DataFrame with an `ImagePath` column.
+
+    Returns:
+        The number of missing images.
+    """
     # Check that all images exist
     missing = [p for p in data['ImagePath'] if not os.path.exists(p)]
     if missing:
@@ -65,6 +92,19 @@ def describe(data):
 
 
 def draw_histogram(ax, data, bins, samples_per_bin=None, title=''):
+    """Draw a steering-angle histogram on the given axes.
+
+    Args:
+        ax: The matplotlib axes to draw on.
+        data: A DataFrame with a `Steering` column.
+        bins: Bin edges to use, as returned by `np.histogram`.
+        samples_per_bin: If given, draw a horizontal reference line at this
+            count to show the balancing cap.
+        title: Title prefix for the axes.
+
+    Returns:
+        None. The histogram is drawn directly on `ax`.
+    """
     hist, _ = np.histogram(data['Steering'], bins=bins)
     centers = (bins[:-1] + bins[1:]) * 0.5
     width = (bins[1] - bins[0]) * 0.9
@@ -81,6 +121,18 @@ def draw_histogram(ax, data, bins, samples_per_bin=None, title=''):
 
 
 def plot_comparison(before, after, n_bins=25, samples_per_bin=None):
+    """Plot side-by-side steering-angle histograms before and after balancing.
+
+    Args:
+        before: The DataFrame prior to balancing.
+        after: The DataFrame after balancing.
+        n_bins: Number of histogram bins, shared between both plots.
+        samples_per_bin: If given, draw a horizontal reference line at this
+            count on both plots.
+
+    Returns:
+        None. Displays the comparison figure.
+    """
     # Plot the before and after histograms
     _, bins = np.histogram(before['Steering'], n_bins)
 
@@ -93,6 +145,21 @@ def plot_comparison(before, after, n_bins=25, samples_per_bin=None):
 
 
 def balance_data(data, n_bins=25, samples_per_bin=400, seed=42):
+    """Downsample over-represented steering-angle bins to flatten the distribution.
+
+    Bins the steering angles into `n_bins` histogram bins and, for any bin
+    exceeding `samples_per_bin`, randomly drops the excess rows so no bin
+    contributes more than the cap.
+
+    Args:
+        data: A DataFrame with a `Steering` column.
+        n_bins: Number of histogram bins to group steering angles into.
+        samples_per_bin: Maximum rows to keep per bin.
+        seed: Random seed controlling which rows are dropped.
+
+    Returns:
+        A new, re-indexed DataFrame with the excess rows removed.
+    """
     # Balance the data
     rng = np.random.default_rng(seed)
     steering = data['Steering'].values
