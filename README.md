@@ -91,13 +91,13 @@ The model architecture consists of five convolutional layers followed by three f
 
 # Training
 
-The model was trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.0001. Training was initially conducted over 15 epochs with 300 steps per epoch and a batch size of 100, but then changed to 50epochs with 100 steps per epoch to experiment. This nearly doubled the training time, despite the number of steps being nearly the same (4500 vs 5000). It did, however, result in a significantly better performance, allowing us to test the simulator at 30 MPH rather than 10. 
+The model was trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.0001. Training was initially conducted over 15 epochs with 300 steps per epoch and a batch size of 100, but then changed to 50epochs with 100 steps per epoch to experiment. This nearly doubled the training time, despite the number of steps being nearly the same (4500 vs 5000). It did, however, result in a significantly better performance, allowing us to test the simulator at 30 MPH rather than 10.
 
-During training, the batches were streamed dynamically by the batch generator, applying augmentation on the data set before passing images through the preprocessing pipeline.  Conversely, the validation set was built using unaugmented preprocessed images to evaluate the model's performance in real world conditions.
+During training, the batches were streamed dynamically by the batch generator, applying augmentation on the data set before passing images through the preprocessing pipeline. Conversely, the validation set was built using unaugmented preprocessed images to evaluate the model's performance in real world conditions.
 
-The loss curve rapidly decreases in the first three epochs as the model learns basic spatial features such as road borders and lane positions. From epoch 4 onward, the training loss decreases at a more steady pace, eventually flattening out at an error of 0.0062. 
+The loss curve rapidly decreases in the first three epochs as the model learns basic spatial features such as road borders and lane positions. From epoch 4 onward, the training loss decreases at a more steady pace, eventually flattening out at an error of 0.0062.
 
-Validation loss remains lower than training loss consistently through the loss curve, with the biggest difference being in the first three epochs. This is likely due to the model having more trouble with the augmented images in the training data set than the unmodified images in the validation data set. 
+Validation loss remains lower than training loss consistently through the loss curve, with the biggest difference being in the first three epochs. This is likely due to the model having more trouble with the augmented images in the training data set than the unmodified images in the validation data set.
 
 <img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/0b9a42b9-0e53-4ef1-9cb5-41b22b97b294" />
 
@@ -152,7 +152,13 @@ A video of the first model driving can be found [uploaded to youtube](https://yo
 
 # Challenges
 
-[TODO]
+The goal of the project was to train a model capable of autonomously controlling a simulated vehicle. Therefore, a set of performance measures was used to evaluate how well the model performs the assigned task. Some of the key indicators were MSE loss for the validation set and real-time testing in the simulator. The challenges we encountered in this project came from attempts to optimize the performance metrics, achieving the highest accuracy possible. Namely, the most challenging, and arguably, the most significant part of the project was data-related work.
+
+Under the umbrella term of data-related work, numerous stages are included, such as data collection, data filtering and balancing, data preprocessing, and data augmentation. As discussed above, experimentation with the model structure and training approaches did not yield sufficient improvements; hence, a conclusion can be made that the model structure proposed in the document is already comprehensive enough to tackle the autonomous steering task. The real bottleneck, therefore, is in the quantity and quality of the training data.
+
+Upon experimentation with the data pipeline, it has been found that the training outcomes are highly sensitive to many changes, including individual frame preprocessing and dataset balancing at large. Arguably, the most complicated part of the project was to select appropriate data pipeline techniques and hyperparameters, such as the number of samples per steering angles bin, data shuffling algorithm, and the augmentation settings.
+
+Going forward, the limiting factor in the model’s further accuracy progression is likely not in the model’s capacity or training length, but rather in the data. Collecting a substantially larger synthetic dataset that includes numerous drivers, terrains, and roads, as well as more meticulous filtering and balancing of the training set, could allow training a better generalized CNN steering predictor, yielding lower loss and better performance in the simulator.
 
 ## Colour space conversion
 
@@ -178,4 +184,4 @@ os.environ['KMP_BLOCKTIME'] = '0'
 
 These environment variables also needed to be added to the `TestSimulation.py` for consistency.
 
-`TF_DISABLE_MKL` instructs TensorFlow to use its fallback kernels instead of MKL's. `OMP_NUM_THREADS` caps the OpenMP thread pool to avoid oversubscription on a 16-core machine, and `KMP_BLOCKTIME` stops idle threads from spinning for 200 ms before sleeping. These three combined appeared to fix the problem, as the training was able to complete, with a training time per epoch of around 50 seconds. 
+`TF_DISABLE_MKL` instructs TensorFlow to use its fallback kernels instead of MKL's. `OMP_NUM_THREADS` caps the OpenMP thread pool to avoid oversubscription on a 16-core machine, and `KMP_BLOCKTIME` stops idle threads from spinning for 200 ms before sleeping. These three combined appeared to fix the problem, as the training was able to complete, with a training time per epoch of around 50 seconds.
