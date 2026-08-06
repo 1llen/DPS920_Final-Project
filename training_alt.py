@@ -88,6 +88,20 @@ model.summary()
 # CUSTOM LOSS 
 
 def weighted_mse(y_true, y_pred):
+    """MSE loss that upweights samples with larger steering angles.
+
+    Straight-driving frames (steering near zero) dominate the dataset, so a
+    plain MSE would under-penalize errors on sharp turns. Each sample's
+    squared error is scaled by 1 + 5 * |y_true|, so bigger true steering
+    angles count more toward the loss.
+
+    Args:
+        y_true: Ground-truth steering angles.
+        y_pred: Predicted steering angles.
+
+    Returns:
+        The scalar weighted mean squared error.
+    """
     # Penalizing values close to zero
     weights = 1.0 + 5.0 * tf.abs(y_true)
     squared_error = tf.square(y_true - y_pred)
